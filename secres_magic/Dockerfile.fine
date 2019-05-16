@@ -1,0 +1,6 @@
+# syntax = docker/dockerfile:1.0-experimental
+FROM alpine
+
+RUN --mount=type=secret,id=mysecret,dst=/foobar cat /foobar | md5sum > /foo
+
+ENTRYPOINT cat /foo

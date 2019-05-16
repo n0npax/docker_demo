@@ -1,0 +1,46 @@
+FROM alpine:3.8 AS builder
+
+ENV LANG C.UTF-8
+
+# runtime
+RUN apk add --no-cache python3
+RUN ln -sf /usr/bin/pip3 /usr/bin/pip
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
+# dev runtime
+RUN apk add --no-cache --virtual .build-deps build-base python3-dev
+
+RUN pip install --upgrade pip
+RUN pip install --upgrade setuptools
+
+# pyroot (pip will install to pyroot)
+ENV PYROOT /pyroot
+# env fix
+ENV PATH $PYROOT/bin:$PATH
+ENV PYTHONUSERBASE $PYROOT
+
+# install deps
+WORKDIR /build
+COPY requirements.txt ./
+RUN pip install --user --ignore-installed -r requirements.txt
+
+# stage PROD
+FROM alpine AS prod
+
+# runtime
+RUN apk add --no-cache python3
+RUN ln -sf /usr/bin/pip3 /usr/bin/pip
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
+# reusing pyroot
+ENV PYROOT /pyroot
+# env fix
+ENV PATH $PYROOT/bin:$PATH
+ENV PYTHONPATH $PYROOT/lib/python:$PATH
+ENV PYTHONUSERBASE $PYROOT
+
+# Finally, copy artifacts
+COPY --from=builder $PYROOT/lib/ $PYROOT/lib/
+
+COPY ./app.py /
+ENTRYPOINT python3 /app.py

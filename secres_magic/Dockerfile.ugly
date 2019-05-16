@@ -1,0 +1,7 @@
+FROM alpine
+
+COPY ./mysecret.txt /foobar
+RUN cat /foobar | md5sum
+RUN rm /foobar
+
+ENTRYPOINT cat /foo

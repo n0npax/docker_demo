@@ -1,0 +1,8 @@
+FROM alpine
+
+RUN dd if=/dev/zero of=/foo bs=4M count=10
+RUN rm /foo
+RUN dd if=/dev/zero of=/foo bs=4M count=10
+RUN rm /foo
+
+ENTRYPOINT echo foo
