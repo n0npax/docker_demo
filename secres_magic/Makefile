@@ -1,4 +1,11 @@
-all: fine ugly
+all:
+	$(MAKE) fine
+	$(MAKE) ugly
+	echo "chop chop time"
+	$(MAKE) evil
+
+evil:
+	docker inspect ugly_secret | grep LowerDir
 
 ugly:
 	docker build -f Dockerfile.ugly -t ugly_secret .
